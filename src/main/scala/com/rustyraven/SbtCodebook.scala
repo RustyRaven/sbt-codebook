@@ -7,22 +7,20 @@ import com.rustyraven.codebook.ProtocolGenerator
 object SbtCodebook extends Plugin {
   val Codebook = config("codebook")
 
-  val codebookTargetLanguage = SettingKey[String]("Code generation target language")
+//  val codebookTargetLanguage = SettingKey[String]("Code generation target language")
   val codebookGenerate = TaskKey[Seq[File]]("Generate classes from codebook definitions")
 
   val codebookSettings = inConfig(Codebook)(Seq(
     sourceDirectory <<= (sourceDirectory in Compile) { _ / "codebook"},
-    scalaSource <<= (sourceManaged in Compile).apply(_ / "codebook"),
-    managedClasspath <<= (configuration, classpathTypes, update) map Classpaths.managedJars
+    scalaSource <<= (sourceManaged in Compile).apply(_ / "codebook")
+//    managedClasspath <<= (configuration, classpathTypes, update) map Classpaths.managedJars
   )) ++ Seq(
     managedSourceDirectories in Compile <+= (scalaSource in Codebook),
     sourceGenerators in Compile <+= (codebookGenerate in Codebook)
   )
 
-  def codebookGenerate(srcFiles:Set[File],targetBaseDir:File,classpath:Seq[File],log:Logger):Set[File] = {
-
-
-    Set()
+  def codebookGenerate(srcFiles:Set[File],targetBaseDir:File,log:Logger):Set[File] = {
+    srcFiles.map(src=>ProtocolGenerator.generate(src,targetBaseDir,"scala")).flatten
   }
 
   def codebookGeneratorTask:Def.Initialize[Task[Seq[File]]] = Def.task {
@@ -31,7 +29,6 @@ object SbtCodebook extends Plugin {
         codebookGenerate(
           in,
           (scalaSource in Codebook).value,
-          (managedClasspath in Codebook).value.files,
           streams.value.log)
     }
     cachedCompile(((sourceDirectory in Codebook).value ** "*.cb").get.toSet).toSeq
