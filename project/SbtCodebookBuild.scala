@@ -14,6 +14,7 @@ object SbtCodebookBuild extends Build {
       organization := "com.rustyraven",
       version := "1.0-SNAPSHOT",
       sbtPlugin := true,
+//      publishMavenStyle := true,
 
       resolvers ++= Seq("RustyRaven Repository" at "http://rustyraven.github.io"),
       libraryDependencies ++= Seq(
