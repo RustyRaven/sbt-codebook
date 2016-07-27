@@ -14,7 +14,6 @@ object CodebookPlugin extends AutoPlugin {
     val codebookUsePlaneProtocol = SettingKey[Boolean]("Generate Plane Protocol")
     val codebookWithJsonSerializer = SettingKey[Boolean]("Generate JSON serializer")
     val codebookUseBigEndian = SettingKey[Boolean]("Use Big Endian for serialization")
-    //val debug = TaskKey[Unit]("debug")
   }
 
   import autoImport._
@@ -30,21 +29,18 @@ object CodebookPlugin extends AutoPlugin {
   override lazy val projectSettings = inConfig(Codebook)(Seq(
     sourceDirectory <<= (sourceDirectory in Compile) { _ / "codebook"},
     scalaSource <<= (sourceManaged in Compile).apply(_ / "codebook"),
-    codebookGenerate <<= generatorTask,
-    //debug <<= debugTask,
+    codebookGenerate <<= generatorTask
+  )) ++ Seq(
     codebookDecoderPackageName := None,
     codebookUsePlaneProtocol := false,
     codebookWithJsonSerializer := false,
-    codebookUseBigEndian := false
-//    codebookBuildDependency := "com.rustyraven" %% "codebook" % "1.0-SNAPSHOT"
-//    managedClasspath <<= (configuration, classpathTypes, update) map Classpaths.managedJars
-  )) ++ Seq(
+    codebookUseBigEndian := false,
+
     ivyConfigurations += Codebook,
     managedSourceDirectories in Compile <+= (scalaSource in Codebook),
     sourceGenerators in Compile <+= (codebookGenerate in Codebook),
     watchSources <++= sourceDirectory map (path => (path ** "*.cb").get),
     cleanFiles <+= (scalaSource in Codebook)
-//    libraryDependencies <+= (codebookBuildDependency in Codebook)
   )
 
 //  lazy val debugTask = Def.task {
