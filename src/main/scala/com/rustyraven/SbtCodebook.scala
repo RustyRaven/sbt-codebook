@@ -54,7 +54,12 @@ object CodebookPlugin extends AutoPlugin {
   def generatorTask:Def.Initialize[Task[Seq[File]]] = Def.task {
     val cachedCompile = FileFunction.cached(streams.value.cacheDirectory / "codebook", FilesInfo.lastModified, FilesInfo.exists) {
       src:Set[File] =>
-        ProtocolGenerator.generate(src,(scalaSource in Codebook).value,"scala",(codebookDecoderPackageName/* in Codebook*/).value,(codebookUsePlaneProtocol/* in Codebook*/).value,(codebookWithJsonSerializer/* in Codebook*/).value,(codebookUseBigEndian/* in Codebook*/).value)
+        ProtocolGenerator.generate(src,
+          (scalaSource in Codebook).value,
+          "scala",(codebookDecoderPackageName/* in Codebook*/).value,
+          (codebookUsePlaneProtocol/* in Codebook*/).value,
+          (codebookWithJsonSerializer/* in Codebook*/).value,
+          (codebookUseBigEndian/* in Codebook*/).value)
     }
     cachedCompile(((sourceDirectory in Codebook).value ** "*.cb").get.toSet).toSeq
   }

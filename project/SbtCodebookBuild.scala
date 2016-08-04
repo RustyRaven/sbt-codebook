@@ -8,13 +8,10 @@ object SbtCodebookBuild extends Build {
     base = file("."),
 
     settings = Seq(
-//      scalaVersion := "2.11.7",
-//      scalacOptions ++= Seq("-deprecation","-feature","-language:implicitConversions"),
       name := "sbt-codebook",
       organization := "com.rustyraven",
       version := "1.0-SNAPSHOT",
       sbtPlugin := true,
-//      publishMavenStyle := true,
 
       resolvers ++= Seq("RustyRaven Repository" at "http://rustyraven.github.io"),
       libraryDependencies ++= Seq(
