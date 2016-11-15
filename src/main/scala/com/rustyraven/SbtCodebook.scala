@@ -10,10 +10,7 @@ object CodebookPlugin extends AutoPlugin {
 
   object autoImport {
     val codebookGenerate = TaskKey[Seq[File]]("generate")
-    val codebookDecoderPackageName = SettingKey[Option[String]]("Decoder code package name")
-    val codebookUsePlaneProtocol = SettingKey[Boolean]("Generate Plane Protocol")
-    val codebookWithJsonSerializer = SettingKey[Boolean]("Generate JSON serializer")
-    val codebookUseBigEndian = SettingKey[Boolean]("Use Big Endian for serialization")
+    val withDocument = SettingKey[Boolean]("Generate Document")
   }
 
   import autoImport._
@@ -31,10 +28,7 @@ object CodebookPlugin extends AutoPlugin {
     scalaSource <<= (sourceManaged in Compile).apply(_ / "codebook"),
     codebookGenerate <<= generatorTask
   )) ++ Seq(
-    codebookDecoderPackageName := None,
-    codebookUsePlaneProtocol := false,
-    codebookWithJsonSerializer := false,
-    codebookUseBigEndian := false,
+    withDocument := false,
 
     ivyConfigurations += Codebook,
     managedSourceDirectories in Compile <+= (scalaSource in Codebook),
@@ -43,23 +37,16 @@ object CodebookPlugin extends AutoPlugin {
     cleanFiles <+= (scalaSource in Codebook)
   )
 
-//  lazy val debugTask = Def.task {
-//    val log = streams.value.log
-//    log.info(s"sourceDirectory:${(sourceDirectory in Codebook).value}")
-//    log.info(s"scalaSource:${(scalaSource in Codebook).value}")
-//    log.info(s"watchSources:${(sourceDirectory map (path => (path ** "*.cb").get)).value}")
-//    log.info(s"generate:${(generate in Codebook).value}")
-//  }
-
   def generatorTask:Def.Initialize[Task[Seq[File]]] = Def.task {
     val cachedCompile = FileFunction.cached(streams.value.cacheDirectory / "codebook", FilesInfo.lastModified, FilesInfo.exists) {
       src:Set[File] =>
         ProtocolGenerator.generate(src,
           (scalaSource in Codebook).value,
-          "scala",(codebookDecoderPackageName/* in Codebook*/).value,
-          (codebookUsePlaneProtocol/* in Codebook*/).value,
-          (codebookWithJsonSerializer/* in Codebook*/).value,
-          (codebookUseBigEndian/* in Codebook*/).value)
+          "scala",
+          None,
+          false,
+          false,
+          withDocument.value)
     }
     cachedCompile(((sourceDirectory in Codebook).value ** "*.cb").get.toSet).toSeq
   }
