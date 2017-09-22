@@ -12,6 +12,7 @@ object CodebookPlugin extends AutoPlugin {
   object autoImport {
     val codebookGenerate = TaskKey[Seq[File]]("generate")
     val withDocument = SettingKey[Boolean]("Generate Document")
+    val withTestClient = SettingKey[Boolean]("Generate with TestClient code")
     val documentSourceDir = SettingKey[String]("Document source directory")
     val skeleton = InputKey[Unit]("skeleton")
     val document = TaskKey[Unit]("document")
@@ -37,6 +38,7 @@ object CodebookPlugin extends AutoPlugin {
     clientCode <<= clientCodeTask
   )) ++ Seq(
     withDocument := false,
+    withTestClient := false,
     documentSourceDir := "docsrc",
 
     ivyConfigurations += Codebook,
@@ -53,7 +55,7 @@ object CodebookPlugin extends AutoPlugin {
           (scalaSource in Codebook).value,
           "scala",
           None,
-          false,
+          withTestClient.value,
           false,
           withDocument.value)
     }
