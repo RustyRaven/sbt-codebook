@@ -6,14 +6,16 @@ import com.rustyraven.codebook.{GeneratorOptions, ProtocolGenerator}
 import sbt.plugins.JvmPlugin
 import sbt.complete.DefaultParsers._
 
+import sbt.internal.io.Source
+
 object CodebookPlugin extends AutoPlugin {
   val Codebook = config("codebook")
 
   object autoImport {
     val codebookGenerate = TaskKey[Seq[File]]("generate")
-    val withDocument = SettingKey[Boolean]("Generate Document")
-    val withTestClient = SettingKey[Boolean]("Generate with TestClient code")
-    val documentSourceDir = SettingKey[String]("Document source directory")
+    val withDocument = SettingKey[Boolean]("generate document")
+    val withTestClient = SettingKey[Boolean]("generate with TestClient code")
+    val documentSourceDir = SettingKey[String]("document source directory")
     val skeleton = InputKey[Unit]("skeleton")
     val document = TaskKey[Unit]("document")
     val clientCode = InputKey[Unit]("clientCode")
@@ -21,7 +23,7 @@ object CodebookPlugin extends AutoPlugin {
 
   import autoImport._
 
-  private val codebookBuildDependency = SettingKey[ModuleID]("Build dependency")
+  private val codebookBuildDependency = SettingKey[ModuleID]("build dependency")
 
   /*
     http://stackoverflow.com/questions/25158287/how-do-i-modify-sourcegenerators-in-compile-from-an-autoplugin
@@ -30,22 +32,22 @@ object CodebookPlugin extends AutoPlugin {
   override def requires = JvmPlugin
 
   override lazy val projectSettings = inConfig(Codebook)(Seq(
-    sourceDirectory <<= (sourceDirectory in Compile) { _ / "codebook"},
-    scalaSource <<= (sourceManaged in Compile).apply(_ / "codebook"),
-    codebookGenerate <<= generatorTask,
-    skeleton <<= skeletonTask,
-    document <<= documentTask,
-    clientCode <<= clientCodeTask
+    sourceDirectory := (sourceDirectory in Compile).value / "codebook",
+    scalaSource := (sourceManaged in Compile).value / "codebook",
+    codebookGenerate := generatorTask.value,
+    skeleton := skeletonTask.evaluated,
+    document := documentTask.value,
+    clientCode := clientCodeTask.evaluated
   )) ++ Seq(
     withDocument := false,
     withTestClient := false,
     documentSourceDir := "docsrc",
 
     ivyConfigurations += Codebook,
-    managedSourceDirectories in Compile <+= (scalaSource in Codebook),
-    sourceGenerators in Compile <+= (codebookGenerate in Codebook),
-    watchSources <++= sourceDirectory map (path => (path ** "*.cb").get),
-    cleanFiles <+= (scalaSource in Codebook)
+    managedSourceDirectories in Compile += (scalaSource in Codebook).value,
+    sourceGenerators in Compile += (codebookGenerate in Codebook).taskValue,
+    watchSources += new Source(sourceDirectory.value, "*.cb", HiddenFileFilter),
+    cleanFiles += (scalaSource in Codebook).value
   )
 
   def generatorTask:Def.Initialize[Task[Seq[File]]] = Def.task {
@@ -57,7 +59,7 @@ object CodebookPlugin extends AutoPlugin {
           None,
           withTestClient.value,
           false,
-          withDocument.value)
+          withDocument.value,false)
     }
     cachedCompile(((sourceDirectory in Codebook).value ** "*.cb").get.toSet).toSeq
   }

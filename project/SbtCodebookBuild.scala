@@ -1,7 +1,7 @@
 import sbt._
 import sbt.Keys._
 
-object SbtCodebookBuild extends Build {
+/*object SbtCodebookBuild extends Build {
 
   lazy val codebook = Project(
     id = "sbt-codebook",
@@ -20,4 +20,4 @@ object SbtCodebookBuild extends Build {
 
 //      publishTo := Some(Resolver.file("sbt-codebook",file("../RustyRaven.github.io"))(Patterns(true, Resolver.mavenStyleBasePattern))))
     ))
-}
+} */
