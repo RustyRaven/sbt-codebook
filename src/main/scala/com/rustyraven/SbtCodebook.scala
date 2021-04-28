@@ -16,6 +16,7 @@ object CodebookPlugin extends AutoPlugin {
     val withDocument = SettingKey[Boolean]("generate document")
     val withTestClient = SettingKey[Boolean]("generate with TestClient code")
     val documentSourceDir = SettingKey[String]("document source directory")
+    val clientLanguage = SettingKey[String]("client language")
     val skeleton = InputKey[Unit]("skeleton")
     val document = TaskKey[Unit]("document")
     val clientCode = InputKey[Unit]("clientCode")
@@ -42,6 +43,7 @@ object CodebookPlugin extends AutoPlugin {
     withDocument := false,
     withTestClient := false,
     documentSourceDir := "docsrc",
+    clientLanguage := "csharp",
 
     ivyConfigurations += Codebook,
     managedSourceDirectories in Compile += (scalaSource in Codebook).value,
@@ -82,7 +84,7 @@ object CodebookPlugin extends AutoPlugin {
   }
 
   def clientCodeTask:Def.Initialize[InputTask[Unit]] = Def.inputTask {
-    val args = spaceDelimited("<arg>").parsed
+    val args = spaceDelimited("<language>").parsed
     val lang = args.length match {
       case 0 =>
         "csharp"
