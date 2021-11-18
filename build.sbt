@@ -2,7 +2,7 @@ import sbt.Keys.{publishMavenStyle, _}
 
 scalaVersion := "2.12.9"
 
-val codebookVersion = "1.7.1-SNAPSHOT"
+val codebookVersion = "1.7.2-SNAPSHOT"
 
 lazy val codebook = (project in file("."))
   .enablePlugins(SbtPlugin)
@@ -44,7 +44,7 @@ lazy val codebook = (project in file("."))
         Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
 
-    publishArtifact in Test := false,
+    Test / publishArtifact := false,
     pomIncludeRepository := { _ => false },
     sonatypeProfileName := "com.rusty-raven",
     pomExtra :=
