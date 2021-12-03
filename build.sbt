@@ -2,7 +2,7 @@ import sbt.Keys.{publishMavenStyle, _}
 
 scalaVersion := "2.12.9"
 
-val codebookVersion = "1.7.3-SNAPSHOT"
+val codebookVersion = "1.7.4-SNAPSHOT"
 
 lazy val codebook = (project in file("."))
   .enablePlugins(SbtPlugin)
