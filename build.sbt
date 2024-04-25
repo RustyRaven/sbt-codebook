@@ -2,7 +2,7 @@ import sbt.Keys.{publishMavenStyle, _}
 
 scalaVersion := "2.12.9"
 
-val codebookVersion = "1.14.0-SNAPSHOT"
+val codebookVersion = "1.15.0-SNAPSHOT"
 
 lazy val codebook = (project in file("."))
   .enablePlugins(SbtPlugin)
@@ -19,7 +19,6 @@ lazy val codebook = (project in file("."))
 //      val sv = appConfiguration.value.provider.id.version
 //      ("org.scala-sbt" % "compiler-interface" % sv % "component").sources
 //    },
-    pluginCrossBuild / sbtVersion := {
           scalaBinaryVersion.value match {
             case "2.12" => "1.2.8" // set minimum sbt version
           }
