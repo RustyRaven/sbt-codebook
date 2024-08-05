@@ -1,14 +1,19 @@
 import sbt.Keys.{publishMavenStyle, _}
 
-scalaVersion := "2.12.9"
+resolvers in Global += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-val codebookVersion = "1.15.0-SNAPSHOT"
+scalaVersion := "2.12.19"
+
+val codebookVersion = "1.23.0-SNAPSHOT"
+
+val codebookLibrary = Seq("com.rusty-raven" %% "codebook" % codebookVersion changing())
 
 lazy val codebook = (project in file("."))
   .enablePlugins(SbtPlugin)
   .settings(
     name := "sbt-codebook",
     organization := "com.rusty-raven",
+    scalaVersion := "2.12.19",
     version := codebookVersion,
     sbtPlugin := true,
 
@@ -19,14 +24,14 @@ lazy val codebook = (project in file("."))
 //      val sv = appConfiguration.value.provider.id.version
 //      ("org.scala-sbt" % "compiler-interface" % sv % "component").sources
 //    },
-          scalaBinaryVersion.value match {
-            case "2.12" => "1.2.8" // set minimum sbt version
-          }
-        },
+//    pluginCrossBuild / sbtVersion := {
+//        scalaBinaryVersion.value match {
+//          case "2.12" => "1.2.8" // set minimum sbt version
+//        }
+//      },
 
-    resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-    libraryDependencies ++= Seq(
-      "com.rusty-raven" %% "codebook" % codebookVersion changing()),
+//    resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+    libraryDependencies ++= codebookLibrary,
 
 //    publishTo := Some(
 //      if (isSnapshot.value)
