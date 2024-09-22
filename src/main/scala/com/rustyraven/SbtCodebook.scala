@@ -55,27 +55,12 @@ object CodebookPlugin extends AutoPlugin {
     cleanFiles += (Codebook / scalaSource).value
   )
 
-  private val buildMapping: Def.Initialize[Task[Seq[Def.Initialize[(ProjectRef, Seq[Seq[File]])]]]] = {
-    Def.taskDyn {
-      val refs = loadedBuild.value.allProjectRefs
-
-      val tt = refs.map(_._1).map {
-        ref =>
-          sourceDirectories.all(ScopeFilter(inProjects(ref)))
-            .zipWith(Def.setting(ref)) { case (a, b) => b -> a }
-      }
-
-      Def.task {
-        tt
-      }
-    }
-  }
-  
   def generatorTask:Def.Initialize[Task[Seq[File]]] = Def.task {
+    val refs = referenceFiles.value
     val cachedCompile = FileFunction.cached(streams.value.cacheDirectory / "codebook", FilesInfo.lastModified, FilesInfo.exists) {
       src:Set[File] =>
         ProtocolGenerator.generate(src,
-          Set.empty,
+          refs,
           (Codebook / scalaSource).value,
           "scala",
           None,
@@ -95,18 +80,20 @@ object CodebookPlugin extends AutoPlugin {
         Some(args.head)
     }
     val _sources = (sourceDirectory map (path => (path ** "*.cb").get)).value.toSet
+    val refs = referenceFiles.value
     ProtocolGenerator.generate(
       _sources,
-      Set.empty[File],
+      refs,
       new File(baseDirectory.value,"skeleton"),
       "scala",None,GeneratorOptions(false,false,category.forall(_ => false),true,category))
   }
 
   def documentTask:Def.Initialize[Task[Unit]] = Def.task {
     val _sources = (sourceDirectory map (path => (path ** "*.cb").get)).value.toSet
+    val refs = referenceFiles.value
     ProtocolGenerator.generate(
       _sources,
-      Set.empty[File],
+      refs,
       new File(baseDirectory.value,documentSourceDir.value),
       "sphinx",
       None,
@@ -122,9 +109,10 @@ object CodebookPlugin extends AutoPlugin {
         args.head
     }
     val _sources = (sourceDirectory map (path => (path ** "*.cb").get)).value.toSet
+    val refs = referenceFiles.value
     ProtocolGenerator.generate(
       _sources,
-      Set.empty[File],
+      refs,
       new File(baseDirectory.value,s"clientCode/$lang"),
       lang,
       Some(new File(baseDirectory.value,documentSourceDir.value)),
@@ -133,9 +121,10 @@ object CodebookPlugin extends AutoPlugin {
 
   def migrationTask:Def.Initialize[Task[Unit]] = Def.task {
     val _sources = (sourceDirectory map (path => (path ** "*.cb").get)).value.toSet
+    val refs = referenceFiles.value
     ProtocolGenerator.generate(
       _sources,
-      Set.empty[File],
+      refs,
       new File(baseDirectory.value,"src/main/migrations"),
       "liquibase",
       None,
